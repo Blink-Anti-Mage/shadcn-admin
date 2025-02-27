@@ -10,10 +10,22 @@ import { UsersTable } from './components/users-table'
 import UsersProvider from './context/users-context'
 import { userListSchema } from './data/schema'
 import { users } from './data/users'
+import {userList} from "./data/service";
+import { useQuery } from '@tanstack/react-query';
 
 export default function Users() {
   // Parse user list
-  const userList = userListSchema.parse(users)
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['users'],
+    queryFn: async () => {
+      const response: { data: any } = await userList({pageNum:1,pageSize:100})
+      return response.data.data
+    },
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading users</div>;
 
   return (
     <UsersProvider>
@@ -36,7 +48,7 @@ export default function Users() {
           <UsersPrimaryButtons />
         </div>
         <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0'>
-          <UsersTable data={userList} columns={columns} />
+          <UsersTable data={data} columns={columns} />
         </div>
       </Main>
 
