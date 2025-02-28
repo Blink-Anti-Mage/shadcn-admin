@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { deleteToken, getToken } from "./auth";
+import { toast } from '@/hooks/use-toast'
 
 
 export interface ResponseData<T> {
@@ -24,8 +25,11 @@ instance.interceptors.request.use(
 
 instance.interceptors.response.use(
   response => {
-    if (response.data.code === -2) {
-      confirm('登录过期，请重新登录');
+    if (response.data.code === 2) {
+      toast.info({
+        title: "登录过期",
+        description: "请重新登录",
+      })
     }
     return Promise.resolve(response.data);
   },
